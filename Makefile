@@ -14,6 +14,10 @@ migrate-up:
 migrate-down:
 	@migrate -path=${MIGRATIONS_PATH} -database=${DB_MIGRATOR_ADDR} down ${filter-out $@, $(MAKECMDGOALS)}
 
+.PHONY: migrate-force
+migrate-force:
+	@migrate -path=${MIGRATIONS_PATH} -database=${DB_MIGRATOR_ADDR} force ${filter-out $@, $(MAKECMDGOALS)}
+
 .PHONY: migrate-delete-latest
 migrate-delete-latest:
 	@LATEST=$$(ls -1 ${MIGRATIONS_PATH}/*.up.sql | sort | tail -n 1); \
