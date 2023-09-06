@@ -1,0 +1,21 @@
+# Ignore direnv environment file
+.envrc
+
+# Ignore dotenv files
+.env
+.env.*
+
+# Ignore database migration history (optional)
+*.db
+*.sqlite
+
+# Ignore node_modules if using JS tooling
+node_modules/
+
+# Ignore Go build outputs
+bin/
+*.exe
+*.out
+*.test
+
+# Igno
