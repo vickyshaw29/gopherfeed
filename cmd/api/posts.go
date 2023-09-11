@@ -10,6 +10,10 @@ import (
 	"github.com/vickyshaw29/gopherfeed/cmd/internal/store"
 )
 
+type postKey string
+
+const postCtx postKey = "post"
+
 type CreatePostPayload struct {
 	Title   string   `json:"title" validate:"required,max=100"`
 	Content string   `json:"content" validate:"required,max=1000"`
@@ -89,6 +93,18 @@ func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request
 
 func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromCtx(r)
+	var payload UpdatePostPayload
+	if err := readJSON(w, r, &payload); err != nil {
+		app.badRequestError(w, r, err)
+		return
+	}
+	if err := Validate.Struct(payload); err != nil {
+		app.badRequestError(w, r, err)
+	}
+	if err := app.store.Posts.UpdateById(r.Context(), post); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
 	if err := writeJSON(w, http.StatusOK, post); err != nil {
 		app.internalServerError(w, r, err)
 	}
@@ -114,7 +130,7 @@ func (app *application) postsContentMiddleware(next http.Handler) http.Handler {
 			}
 			return
 		}
-		ctx = context.WithValue(ctx, "post", post)
+		ctx = context.WithValue(ctx, postCtx, post)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
