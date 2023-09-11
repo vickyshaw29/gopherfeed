@@ -51,20 +51,9 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
-	postIDStr := chi.URLParam(r, "postID")
-	postID, err := strconv.Atoi(postIDStr)
-	if err != nil {
-		app.internalServerError(w, r, err)
-		return
-	}
-	ctx := r.Context()
-	post, err := app.store.Posts.GetById(ctx, postID)
-	if err != nil {
-		app.internalServerError(w, r, err)
-		return
-	}
+	post := getPostFromCtx(r)
 
-	comments, err := app.store.Comments.GetByPostID(ctx, int64(postID))
+	comments, err := app.store.Comments.GetByPostID(r.Context(), int64(post.ID))
 	if err != nil {
 		app.internalServerError(w, r, err)
 	}
