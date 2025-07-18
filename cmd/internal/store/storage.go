@@ -7,16 +7,17 @@ import (
 
 type Storage struct {
 	Posts interface {
-		Create(context.Context) error
+		Create(ctx context.Context, post *Post) error
+		GetById(ctx context.Context, postID int) (*Post, error)
 	}
 	Users interface {
-		Create(context.Context) error
+		Create(ctx context.Context, user *User) error
 	}
 }
 
 func NewStorage(db *sql.DB) Storage {
 	return Storage{
-		Posts: &PostsStore{db},
+		Posts: &PostStore{db},
 		Users: &UsersStore{db},
 	}
 }

@@ -15,8 +15,16 @@ type application struct {
 	store  store.Storage
 }
 
+type dbConfig struct {
+	addr         string
+	maxOpenCons  int
+	maxIdleConns int
+	maxIdleTime  string
+}
+
 type config struct {
 	addr string
+	db   dbConfig
 }
 
 func (app *application) mount() http.Handler {
@@ -24,6 +32,12 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.Logger)
 	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", app.healthCheckHandler)
+		r.Route("/posts", func(c chi.Router) {
+			c.Post("/", app.createPostHandler)
+			c.Route("/{postID}", func(c chi.Router) {
+				c.Get("/", app.getPostHandler)
+			})
+		})
 	})
 	return r
 }
